@@ -29,7 +29,7 @@ def set_ui_theme():
 set_ui_theme()
 
 # Now rest of your code
-st.image("logo.png", width=120)
+st.image("NUTRIMAMA.png", width=120)
 
 greeting_header()
 nutrition_stats()
