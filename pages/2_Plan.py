@@ -64,7 +64,7 @@ hr {
 
 
 # --- User Profile Section ---
-st.title("🌸 Your Personalized Nutrition Plan")
+st.title("Your Personalized Nutrition Plan")
 
 
 with st.expander("Edit Profile Information"):

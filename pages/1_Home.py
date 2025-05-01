@@ -99,6 +99,106 @@ def quick_actions():
         with col:
             st.button(f"{icon} {text}")
 
+def medication_safety_section():
+    st.markdown('<div class="section">', unsafe_allow_html=True)
+    st.subheader("💊 Medication Safety Checker for Breastfeeding")
+    
+    # Input methods
+    med_input = st.radio("Input Method:", ["Scan Barcode", "Search Manually"], horizontal=True)
+    
+    if med_input == "Scan Barcode":
+        st.camera_input("Scan medication barcode", key="barcode_scan")
+        medication = "BarcodeScannedDrug123"  # Replace with actual scan processing
+    else:
+        medication = st.text_input("Enter medication name", placeholder="e.g., Ibuprofen")
+    
+    # Breastfeeding-specific check
+    with st.expander("Infant Details (Optional)"):
+        infant_age = st.selectbox(
+            "Infant Age", 
+            ["Newborn (0-1 month)", "1-6 months", "6+ months"]
+        )
+    
+    if st.button("Check Safety"):
+        if (med_input == "Search Manually" and not medication):
+            st.warning("Please enter a medication name")
+        else:
+            safety_data = check_lactation_safety(
+                medication,
+                infant_age if infant_age else "1-6 months"  # Default
+            )
+            display_safety_results(safety_data)
+    
+    st.markdown('</div>', unsafe_allow_html=True)
+
+# --- Lactation-Specific Safety Check ---
+def check_lactation_safety(drug_name, infant_age="1-6 months"):
+    """Lactation-focused safety check (replace with real API calls)"""
+    lactation_db = {
+        "ibuprofen": {
+            "category": "L2 (Compatible)",
+            "transfer": "Minimal (<1% of dose)",
+            "effects": "No adverse effects reported",
+            "recommendation": "Usually safe",
+            "alternatives": ["Acetaminophen (if preferred)"]
+        },
+        "pseudoephedrine": {
+            "category": "L3 (Probably Safe)",
+            "transfer": "Low (0.5-3%)",
+            "effects": "May decrease milk supply",
+            "recommendation": "Monitor supply, avoid in first month",
+            "alternatives": ["Saline nasal spray"]
+        },
+        "accutane": {
+            "category": "L5 (Contraindicated)",
+            "transfer": "High (theoretical risk)",
+            "effects": "Severe potential toxicity",
+            "recommendation": "ABSOLUTELY AVOID",
+            "alternatives": ["Topical retinoids (consult doctor)"]
+        }
+    }
+    
+    return lactation_db.get(drug_name.lower(), {
+        "category": "L4 (Limited Data)",
+        "transfer": "Unknown",
+        "effects": "Insufficient information",
+        "recommendation": "Consult healthcare provider",
+        "alternatives": []
+    })
+
+# --- Results Display ---
+def display_safety_results(data):
+    st.markdown("### Lactation Safety Assessment")
+    
+    # Category badge
+    category = data["category"]
+    if "L5" in category:
+        st.error(f"🚨 **{category}** - CONTRAINDICATED")
+    elif "L4" in category:
+        st.warning(f"⚠️ **{category}** - Caution Required")
+    elif "L3" in category:
+        st.warning(f"🔸 **{category}** - Probably Safe")
+    else:
+        st.success(f"✅ **{category}** - Compatible")
+    
+    # Key facts
+    st.markdown("#### Key Facts")
+    st.write(f"- **Milk Transfer:** {data['transfer']}")
+    st.write(f"- **Reported Effects:** {data['effects']}")
+    
+    # Recommendation
+    st.markdown("#### Recommendation")
+    st.write(data["recommendation"])
+    
+    # Alternatives (if any)
+    if data["alternatives"]:
+        st.markdown("#### Safer Alternatives")
+        for alt in data["alternatives"]:
+            st.write(f"- {alt}")
+
+    # References
+    st.caption("ℹ️ Data based on NIH LactMed Database and Hale's Medications & Mothers' Milk")
+
 # =============================================
 # MAIN PAGE LAYOUT
 # =============================================
@@ -112,6 +212,8 @@ greeting_header()
 nutrition_stats()
 st.divider()
 daily_tip()
+st.divider()
+medication_safety_section() 
 st.divider()
 quick_actions()
 
