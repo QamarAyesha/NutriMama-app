@@ -33,7 +33,7 @@ if st.button("Get Meal Plan"):
             # Make a prediction request to the Hugging Face model
             response = client.post(
                 json=inputs,
-                model="your-username/nutrition-api"  # Replace with your actual model's repo name
+                model="ayeshaqamar/nutrition-api"  # Replace with your actual model's repo name
             )
             
             # Check if the response is successful
