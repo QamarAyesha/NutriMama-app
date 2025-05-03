@@ -4,11 +4,14 @@ import altair as alt
 import requests
 from datetime import date, datetime
 
+
 # --- Load USDA API key securely ---
 usda_api_key = st.secrets["api"]["usda_key"]
 
+
 # --- Page Config ---
 st.set_page_config(page_title="NutriMama - Tracker", page_icon="🍽️", layout="centered")
+
 
 # --- Custom CSS ---
 st.markdown(
@@ -16,17 +19,11 @@ st.markdown(
     <style>
     body {
         background-color: #f5f9fc;
+        font-family: Arial, sans-serif;
     }
     .main {
         background-color: #f5f9fc;
         padding: 1rem;
-    }
-    .section {
-        background-color: #ffffff;
-        padding: 2rem;
-        margin-bottom: 2rem;
-        border-radius: 20px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
     }
     .entry {
         background-color: #f0f4f8;
@@ -62,13 +59,32 @@ st.markdown(
     label, p {
         color: #374151;
     }
+    .stButton>button {
+        background-color: #f9c8a7;
+        color: #333333;
+        font-weight: 600;
+        border-radius: 12px;
+        padding: 0.5rem 1rem;
+        border: none;
+    }
+    .header-icon {
+        vertical-align: middle;
+        margin-right: 10px;
+    }
+    /* Media query for responsiveness */
+    @media (max-width: 768px) {
+        .entry {
+            font-size: 14px;
+        }
+    }
     </style>
     """,
     unsafe_allow_html=True
 )
 
-# --- Header ---
-st.title("🍽️ NutriMama Tracker")
+
+st.title("NutriMama Tracker")
+
 
 # --- USDA Nutrient Fetcher ---
 def get_nutrient_info(food_name):
@@ -86,6 +102,7 @@ def get_nutrient_info(food_name):
             return {n["nutrientName"]: n["value"] for n in nutrients}
     return {}
 
+
 # --- Initialize Session State ---
 if "total_vitamin_d" not in st.session_state:
     st.session_state.total_vitamin_d = 0
@@ -96,14 +113,16 @@ if "total_protein" not in st.session_state:
 if "meals" not in st.session_state:
     st.session_state.meals = []
 
+
 # --- Nutrient Summary with Progress Bars ---
-st.markdown('<div class="section">', unsafe_allow_html=True)
 st.subheader("Today's Nutrient Summary")
+
 
 # Hard-coded daily goals
 VITAMIN_D_GOAL_IU = 400
 CALCIUM_GOAL_MG = 1000
 PROTEIN_GOAL_G = 50
+
 
 # Display progress bars using session state
 st.progress(
@@ -119,6 +138,7 @@ st.progress(
     text=f"Protein ({st.session_state.total_protein:.1f} g / {PROTEIN_GOAL_G} g)"
 )
 
+
 # Reset button
 if st.button("Reset All Nutrients"):
     st.session_state.total_vitamin_d = 0
@@ -127,16 +147,15 @@ if st.button("Reset All Nutrients"):
     st.session_state.meals = []
     st.rerun()
 
-st.markdown('</div>', unsafe_allow_html=True)
 
 # --- Meal Logger ---
-st.markdown('<div class="section">', unsafe_allow_html=True)
-st.subheader("Log a Meal")
+st.subheader("🍽️ Log a Meal")
+
 
 with st.form("meal_form"):
     meal_time = st.time_input("Meal Time", value=datetime.now().time())
     meal_name = st.text_input("Food Name", placeholder="e.g., Grilled Chicken Breast")
-    
+   
     # User-friendly portion selection
     portion = st.selectbox(
         "Portion Size",
@@ -144,8 +163,9 @@ with st.form("meal_form"):
         index=1,
         help="Approximate serving size"
     )
-    
+   
     submitted = st.form_submit_button("Add Meal")
+
 
 if submitted and meal_name:
     nutrients = get_nutrient_info(meal_name)
@@ -156,18 +176,18 @@ if submitted and meal_name:
             "Medium (150-200g)": 1.5,
             "Large (200-300g)": 2.0
         }.get(portion, 1.0)
-        
+       
         # Calculate nutrients
         vitamin_d = nutrients.get("Vitamin D (D2 + D3), International Units", 0) * portion_multiplier
         calcium = nutrients.get("Calcium, Ca", 0) * portion_multiplier
         protein = nutrients.get("Protein", 0) * portion_multiplier
         calories = nutrients.get("Energy", 0) * portion_multiplier
-        
+       
         # Update session state
         st.session_state.total_vitamin_d += vitamin_d
         st.session_state.total_calcium += calcium
         st.session_state.total_protein += protein
-        
+       
         # Add meal to log
         st.session_state.meals.append({
             "id": len(st.session_state.meals) + 1,
@@ -179,19 +199,20 @@ if submitted and meal_name:
             "calcium": calcium,
             "protein": protein
         })
-        
+       
         st.success(f"Added: {meal_name} ({portion}, 🔥 {round(calories)} kcal)")
         st.rerun()
     else:
         st.warning("No nutrient data found. Try a more specific name (e.g., 'Grilled Chicken Breast').")
 
+
 # Visual portion guide
 st.caption("💡 **Portion Guide**: Small = 1 palm-sized piece, Medium = 1.5 palms, Large = 2 palms")
-st.markdown('</div>', unsafe_allow_html=True)
+
 
 # --- Today's Meals with Delete Functionality ---
-st.markdown('<div class="section">', unsafe_allow_html=True)
 st.subheader("Today's Meals")
+
 
 if not st.session_state.meals:
     st.info("No meals logged yet. Add your first meal above!")
@@ -202,9 +223,9 @@ else:
             st.markdown(
                 f"""<div class="entry">
                 <strong>{meal['name']}</strong> ({meal['portion']})<br>
-                ⏰ {meal['time']} | 🔥 {meal['calories']} kcal | 
-                Vitamin D: {meal['vitamin_d']:.1f} IU | 
-                Calcium: {meal['calcium']:.1f} mg | 
+                ⏰ {meal['time']} | 🔥 {meal['calories']} kcal |
+                Vitamin D: {meal['vitamin_d']:.1f} IU |
+                Calcium: {meal['calcium']:.1f} mg |
                 Protein: {meal['protein']:.1f} g
                 </div>""",
                 unsafe_allow_html=True
@@ -218,11 +239,10 @@ else:
                 del st.session_state.meals[i]
                 st.rerun()
 
-st.markdown('</div>', unsafe_allow_html=True)
 
 # --- Weekly Chart ---
-st.markdown('<div class="section">', unsafe_allow_html=True)
 st.subheader("Weekly Calorie Overview")
+
 
 # Simulated weekly data (replace with real data later)
 meal_data = {
@@ -230,11 +250,12 @@ meal_data = {
     "Calories": [1800, 2000, 1750, 1900, 2100, 1950, 1850]
 }
 
+
 meal_df = pd.DataFrame(meal_data)
-calorie_chart = alt.Chart(meal_df).mark_line(point=True, color="#f9a07c").encode(
-    x='Date', y='Calories'
-).properties(width="container", height=300)
+calorie_chart = alt.Chart(meal_df).mark_line(point=True, color="#f9c8a7").encode(
+    x="Date:T",
+    y="Calories:Q",
+    tooltip=["Date", "Calories"]
+)
 
 st.altair_chart(calorie_chart, use_container_width=True)
-
-st.markdown('</div>', unsafe_allow_html=True)

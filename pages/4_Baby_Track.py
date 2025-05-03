@@ -1,14 +1,33 @@
 import streamlit as st
 import pandas as pd
 import altair as alt
+from datetime import date
 
 # --- Page Setup ---
 st.set_page_config(page_title="Baby Tracker", page_icon="👶", layout="centered")
-st.title("👶 Baby Growth Tracker")
+st.title("Baby Growth Tracker")
+
+# --- Apply Custom CSS ---
+st.markdown("""
+    <style>
+        .section {
+            margin-top: 0px;
+            margin-bottom: 0px;
+            padding-top: 0px;
+            padding-bottom: 0px;
+        }
+        .stTab {
+            margin-top: 0;
+        }
+        .stForm {
+            margin-top: 0px;
+        }
+    </style>
+""", unsafe_allow_html=True)
 
 # --- Initialize Empty Data ---
 if "growth_data" not in st.session_state:
-    st.session_state.growth_data = pd.DataFrame(columns=["Age (months)", "Weight (kg)", "Height (cm)"])
+    st.session_state.growth_data = pd.DataFrame(columns=["Age (months)", "Weight (kg)", "Height (inches)"])
 
 # --- Data Entry Form ---
 with st.form("growth_form"):
@@ -19,13 +38,13 @@ with st.form("growth_form"):
     with col2:
         weight = st.number_input("Weight (kg)", 0.0, 30.0, format="%.2f")
     with col3:
-        height = st.number_input("Height (cm)", 0.0, 120.0, format="%.1f")
+        height = st.number_input("Height (inches)", 0.0, 50.0, format="%.1f")
     
     if st.form_submit_button("Save"):
         new_entry = pd.DataFrame({
             "Age (months)": [age],
             "Weight (kg)": [weight],
-            "Height (cm)": [height]
+            "Height (inches)": [height]
         })
         st.session_state.growth_data = pd.concat([st.session_state.growth_data, new_entry])
         st.success("Saved!")
@@ -49,13 +68,14 @@ if not st.session_state.growth_data.empty:
         st.write("### Height Progress")
         height_chart = alt.Chart(st.session_state.growth_data).mark_line(point=True).encode(
             x="Age (months):Q",
-            y="Height (cm):Q",
-            tooltip=["Age (months)", "Height (cm)"]
+            y="Height (inches):Q",
+            tooltip=["Age (months)", "Height (inches)"]
         ).properties(height=400)
         st.altair_chart(height_chart, use_container_width=True)
         
 else:
     st.info("No measurements yet. Add your first entry above!")
+
 # --- Milestones Log ---
 st.markdown('<div class="section">', unsafe_allow_html=True)
 st.subheader("Developmental Milestones")

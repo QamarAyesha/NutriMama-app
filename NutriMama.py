@@ -1,5 +1,8 @@
 import streamlit as st
 from datetime import datetime
+from PIL import Image
+import os
+from pathlib import Path
 
 # =============================================
 # INITIALIZE SESSION STATE
@@ -60,22 +63,36 @@ def set_ui_theme():
             color: #666666;
             font-size: 16px;
         }}
+        
+        /* Logo container - UPDATED FOR PERFECT CENTERING */
+        .logo-container {{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            margin: 0 auto 20px auto;
+        }}
     </style>
     """, unsafe_allow_html=True)
+
+
 
 # =============================================
 # ONBOARDING FLOW
 # =============================================
 def show_onboarding():
+
     st.markdown("""
     <div style='background-color: #F8FBFF; border-radius: 12px; padding: 30px; 
                 text-align: center; margin-bottom: 40px;'>
-        <h1 style='margin-bottom: 0; color: #333333;'>Welcome to NutriMama</h1>
+        <h1 style='margin-bottom: 0; color: #333333;'>Welcome to NutriMama!</h1>
         <p style='font-size: 18px; color: #666;'>Your personalized breastfeeding companion</p>
     </div>
     """, unsafe_allow_html=True)
 
     with st.form("onboarding_form"):
+        name = st.text_input("Your Name*", placeholder="Enter your first name")
+        
         col1, col2 = st.columns(2)
         
         with col1:
@@ -107,14 +124,16 @@ def show_onboarding():
         submitted = st.form_submit_button("Begin Your Journey →")
     
     if submitted:
-        if not all([age, region, bf_stage]):
+        if not all([name, age, region, bf_stage]):
             st.error("Please fill all required fields (*)")
         else:
             st.session_state.user_profile = {
+                "name": name,
                 "age": age,
                 "region": region,
                 "bf_stage": bf_stage,
-                "conditions": conditions
+                "conditions": conditions,
+                "onboarded_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             }
             st.success("Profile saved successfully!")
             st.switch_page("pages/1_Home.py")
