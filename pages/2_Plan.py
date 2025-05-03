@@ -35,6 +35,9 @@ if st.button("Get Meal Plan"):
                 json=inputs,
                 model="ayeshaqamar/nutrition-api"  # Replace with your actual model's repo name
             )
+          
+           st.write(response.status_code)  # To check if the response code is 200
+           st.write(response.text)  # To check the error message if any
             
             # Check if the response is successful
             if response.status_code == 200:
