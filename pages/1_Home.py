@@ -48,11 +48,13 @@ def load_image(image_path, width=120):
 # PAGE COMPONENTS
 # =============================================
 def greeting_header():
-    username = st.session_state.user_profile.get('name')
+    username = st.session_state.get("user_profile", {}).get("name", "User")
     current_hour = datetime.now().hour
-    greeting = "Good morning" if 5 <= current_hour < 12 else \
-               "Good afternoon" if 12 <= current_hour < 18 else \
-               "Good evening"
+    greeting = (
+        "Good morning" if 5 <= current_hour < 12 else
+        "Good afternoon" if 12 <= current_hour < 18 else
+        "Good evening"
+    )
     st.markdown(f"""
     <h2 style='margin-top:0;'>{greeting}, {username}! 👋</h2>
     <p>Let's make today nutritious!</p>
