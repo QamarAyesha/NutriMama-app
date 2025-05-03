@@ -1,7 +1,7 @@
 import streamlit as st
 import requests
 
-st.set_page_config(page_title="Meal Plan for Nursing Mothers", layout="centered")
+st.set_page_config(page_title="Meal Plan", layout="centered")
 
 st.title("Meal Plan Recommender for Nursing Mothers")
 st.markdown("Get a personalized meal recommendation based on your region, age, and health.")
@@ -32,9 +32,9 @@ if st.button("Get Meal Plan"):
 
             if response.status_code == 200:
                 data = response.json()
-                st.success(f"Recommended Plan: **{data['plan']}**")
+                st.success(f"Recommended Plan: *{data['plan']}*")
 
-                st.subheader("🍽️ Meal Ideas")
+                st.subheader("🍽 Meal Ideas")
                 for meal in data["meal_ideas"]:
                     st.markdown(f"- {meal}")
 
@@ -45,8 +45,6 @@ if st.button("Get Meal Plan"):
                 st.error("❌ Failed to get recommendation. Please try again.")
 
         except Exception as e:
-            st.error(f"⚠️ Error: {e}")
-
-
+            st.error(f"⚠ Error: {e}")
 
 
