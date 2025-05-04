@@ -36,6 +36,12 @@ def set_ui_theme():
         .stButton button:hover {{
             background-color: #e8b49d !important;
         }}
+        .feature-grid {{
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }}
         .feature-card {{
             background-color: #fef6f1;
             padding: 1.5rem;
@@ -43,6 +49,11 @@ def set_ui_theme():
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
             text-align: center;
             transition: transform 0.3s ease;
+            width: 280px;
+            height: 280px; /* Ensures equal height */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }}
         .feature-card:hover {{
             transform: translateY(-5px);
@@ -59,9 +70,11 @@ def set_ui_theme():
             font-size: 0.9rem;
             color: #555;
             margin-bottom: 1rem;
+            flex-grow: 1;
         }}
     </style>
     """, unsafe_allow_html=True)
+
 
 # =============================================
 # IMAGE HANDLER
@@ -174,14 +187,14 @@ def feature_navigation_cards():
             "icon": "🧠",
             "title": "Mother Tracker",
             "desc": "Track your nutrient and calorie intake.",
-            "page": "pages/3_Mother_track.py",
+            "page": "pages/3_Mother_Track.py",
             "key": "mother_tracker"
         },
         {
             "icon": "📈",
             "title": "Growth Tracker",
             "desc": "Monitor your baby’s development and milestones.",
-            "page": "pages/4_Baby_Tracker.py",
+            "page": "pages/4_Baby_Track.py",
             "key": "baby_tracker"
         },
         {
