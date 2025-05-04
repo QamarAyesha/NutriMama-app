@@ -1,5 +1,6 @@
 import streamlit as st
 from gradio_client import Client
+from datetime import datetime
 
 # =============================================
 # PAGE CONFIG & THEME
@@ -94,6 +95,7 @@ if edit_profile:
             bf_duration_options = ["0-6 Months", "6-12 Months", "12+ Months"]
             condition_options = ["Anemia", "Diabetes", "Thyroid", "PCOS", "Hypertension", "Obesity", "Cholesterol", "None"]
 
+            # Profile Form Inputs (excluding name)
             age = st.selectbox("Age Group", age_options, index=age_options.index(user_profile["age"]))
             region = st.selectbox("Region", region_options, index=region_options.index(user_profile["region"]))
             bf_duration = st.selectbox("Breastfeeding Duration", bf_duration_options, index=bf_duration_options.index(user_profile["bf_duration"]))
@@ -103,28 +105,30 @@ if edit_profile:
             submitted = st.form_submit_button("✅ Update Profile")
 
             if submitted:
-                # Map to breastfeeding stage
-                bf_stage_mapping = {
-                    "0-6 Months": "Lactation",
-                    "6-12 Months": "Weaning",
-                    "12+ Months": "Extended"
-                }
-                bf_stage = bf_stage_mapping.get(bf_duration, "Lactation")
+                if not all([age, region, bf_duration]):
+                    st.error("⚠️ Please fill all required fields.")
+                else:
+                    # Map breastfeeding duration to stage for internal use
+                    bf_stage_mapping = {
+                        "0-6 Months": "Lactation",
+                        "6-12 Months": "Weaning",
+                        "12+ Months": "Extended"
+                    }
+                    bf_stage = bf_stage_mapping.get(bf_duration, "Lactation")
 
-                mapped_conditions = conditions
+                    # Update session state with new profile data, keeping the name unchanged
+                    st.session_state.user_profile = {
+                        "name": user_profile["name"],  # Keep the original name unchanged
+                        "age": age,
+                        "region": region,
+                        "bf_duration": bf_duration,
+                        "bf_stage": bf_stage,
+                        "conditions": conditions,
+                        "onboarded_at": user_profile.get("onboarded_at", "")
+                    }
 
-                # Update session state
-                st.session_state.user_profile = {
-                    "name": user_profile["name"],
-                    "age": age,
-                    "region": region,
-                    "bf_duration": bf_duration,
-                    "bf_stage": bf_stage,
-                    "conditions": mapped_conditions,
-                    "onboarded_at": user_profile.get("onboarded_at", "")
-                }
-                st.success("✅ Profile updated successfully!")
-                st.rerun()  # Trigger UI refresh to reflect new session state
+                    st.success("✅ Profile updated successfully!")
+                    st.rerun()  # 🚀 Trigger UI refresh
 
 # =============================================
 # GET MEAL PLAN
