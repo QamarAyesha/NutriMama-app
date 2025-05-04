@@ -121,6 +121,7 @@ if edit_profile:
                     "onboarded_at": user_profile.get("onboarded_at", "")
                 }
                 st.success("✅ Profile updated successfully!")
+                st.rerun()  # 🚀 Trigger UI refresh
 
 # =============================================
 # GET MEAL PLAN
