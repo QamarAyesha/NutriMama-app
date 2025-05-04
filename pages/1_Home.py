@@ -15,14 +15,6 @@ st.set_page_config(
 )
 
 # =============================================
-# SESSION CHECK
-# =============================================
-if 'user_profile' not in st.session_state or not st.session_state.user_profile:
-    st.warning("🚨 Please complete onboarding first.")
-    st.markdown("Click **'NutriMama'** in the left menu to begin onboarding.")
-    st.stop()
-
-# =============================================
 # STYLE CONFIGURATION
 # =============================================
 def set_ui_theme():
@@ -44,17 +36,10 @@ def set_ui_theme():
         .stButton button:hover {{
             background-color: #e8b49d !important;
         }}
-        .feature-grid {{
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }}
         .feature-card {{
             background-color: #fef6f1;
             padding: 1.5rem;
             border-radius: 15px;
-            width: 280px;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
             text-align: center;
             transition: transform 0.3s ease;
@@ -92,7 +77,7 @@ def load_image(image_path, width=120):
 # PAGE COMPONENTS
 # =============================================
 def greeting_header():
-    profile = st.session_state.user_profile
+    profile = st.session_state.get("user_profile", {})
     username = profile.get("name", "User")
     current_hour = datetime.now().hour
     greeting = (
@@ -181,53 +166,52 @@ def display_safety_results(data):
         for alt in data["alternatives"]:
             st.markdown(f"- {alt}")
 
-def meal_plan_redirect():
-    st.subheader("Personalized Meal Plan")
-    st.write("Based on your onboarding info, view your tailored daily plan.")
-    if st.button("View My Personalized Meal Plan"):
-        st.switch_page("pages/2_Plan.py")
-
 def feature_navigation_cards():
-    st.subheader("Explore More Features")
-    st.markdown("<div class='feature-grid'>", unsafe_allow_html=True)
+    st.subheader("Explore Features")
 
-    # Card 1
-    with st.container():
-        st.markdown("""
-        <div class='feature-card'>
-            <div class='feature-icon'>🧠</div>
-            <div class='feature-title'>Mother Tracker</div>
-            <div class='feature-desc'>To track Nutrient and Calories intake</div>
-        </div>
-        """, unsafe_allow_html=True)
-        if st.button("Go to Tracker", key="mother_tracker"):
-            st.switch_page("pages/3_Mother_track.py")
+    cards = [
+        {
+            "icon": "🧠",
+            "title": "Mother Tracker",
+            "desc": "Track your nutrient and calorie intake.",
+            "page": "pages/3_Mother_track.py",
+            "key": "mother_tracker"
+        },
+        {
+            "icon": "📈",
+            "title": "Growth Tracker",
+            "desc": "Monitor your baby’s development and milestones.",
+            "page": "pages/4_Baby_Tracker.py",
+            "key": "baby_tracker"
+        },
+        {
+            "icon": "🥗",
+            "title": "Meal Planner",
+            "desc": "View your personalized nutrition plan.",
+            "page": "pages/2_Plan.py",
+            "key": "meal_planner"
+        },
+        {
+            "icon": "👩‍👩‍👧‍👦",
+            "title": "Community",
+            "desc": "Get help and share experiences with other moms.",
+            "page": "pages/5_Community.py",
+            "key": "community"
+        }
+    ]
 
-    # Card 2
-    with st.container():
-        st.markdown("""
-        <div class='feature-card'>
-            <div class='feature-icon'>📈</div>
-            <div class='feature-title'>Growth Tracker</div>
-            <div class='feature-desc'>Track your baby’s growth milestones and development.</div>
-        </div>
-        """, unsafe_allow_html=True)
-        if st.button("Go to Baby Tracker", key="baby_tracker"):
-            st.switch_page("pages/4_Baby_Tracker.py")
-
-    # Card 3
-    with st.container():
-        st.markdown("""
-        <div class='feature-card'>
-            <div class='feature-icon'>👩‍👩‍👧‍👦</div>
-            <div class='feature-title'>Community</div>
-            <div class='feature-desc'>Get help from community.</div>
-        </div>
-        """, unsafe_allow_html=True)
-        if st.button("Go to Community", key="community"):
-            st.switch_page("pages/5_Community.py")
-
-    st.markdown("</div>", unsafe_allow_html=True)
+    cols = st.columns(2)
+    for i, card in enumerate(cards):
+        with cols[i % 2]:
+            st.markdown(f"""
+            <div class='feature-card'>
+                <div class='feature-icon'>{card['icon']}</div>
+                <div class='feature-title'>{card['title']}</div>
+                <div class='feature-desc'>{card['desc']}</div>
+            </div>
+            """, unsafe_allow_html=True)
+            if st.button(f"Go to {card['title']}", key=card["key"]):
+                st.switch_page(card["page"])
 
 # =============================================
 # MAIN APP FUNCTION
@@ -235,13 +219,17 @@ def feature_navigation_cards():
 def main():
     set_ui_theme()
     load_image("assets/logo.png", width=140)
+
+    if 'user_profile' not in st.session_state or not st.session_state.user_profile:
+        st.warning("🚨 Please complete onboarding first.")
+        st.markdown("Click **'NutriMama'** in the left menu to begin onboarding.")
+        return
+
     greeting_header()
     nutrition_stats()
     daily_tip()
     st.divider()
     medication_safety_section()
-    st.divider()
-    meal_plan_redirect()
     st.divider()
     feature_navigation_cards()
 
