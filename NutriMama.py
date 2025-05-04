@@ -85,19 +85,21 @@ def show_onboarding():
         col1, col2 = st.columns(2)
 
         with col1:
+            # Updated age, region options to match the model's list
             age = st.selectbox("Your Age Group*", ["18-25", "26-35", "36-45", "45+"], index=1)
-            region = st.selectbox("Region*", ["North America", "South Asia", "Africa", "Europe", "Other"], index=0)
+            region = st.selectbox("Region*", ["North America", "South Asia", "Africa", "Europe", "Middle East", "Other"], index=0)
 
         with col2:
-            # Now using bf_duration instead of bf_stage
+            # Updated breastfeeding duration options
             bf_duration = st.selectbox(
                 "Breastfeeding Duration*",
                 ["0-6 Months", "6-12 Months", "12+ Months"],
                 index=0
             )
+            # Updated health conditions to reflect model changes
             conditions = st.multiselect(
                 "Health Considerations (Optional)",
-                ["Diabetes", "Hypertension", "PCOS", "Thyroid Issues"],
+                ["Anemia", "Diabetes", "Thyroid", "PCOS", "Hypertension", "Obesity", "Cholesterol", "None"],
                 default=[]
             )
 
