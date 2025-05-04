@@ -25,6 +25,14 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
+# =============================================
+# SESSION CHECK: Show message if no profile
+# =============================================
+if 'user_profile' not in st.session_state or not st.session_state.user_profile:
+    st.warning("🚨 Please complete onboarding first.")
+    st.markdown("👉 Click **'NutriMama'** in the left menu to begin onboarding.")
+    st.stop()
+
 # --- Initialize Empty Data ---
 if "growth_data" not in st.session_state:
     st.session_state.growth_data = pd.DataFrame(columns=["Age (months)", "Weight (kg)", "Height (inches)"])
