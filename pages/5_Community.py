@@ -6,7 +6,7 @@ def community_page():
     # =============================================
     if 'user_profile' not in st.session_state or not st.session_state.user_profile:
         st.warning("🚨 Please complete onboarding first.")
-        st.markdown("👉 Click **'NutriMama'** in the left menu to begin onboarding.")
+        st.markdown("Click **'NutriMama'** in the left menu to begin onboarding.")
         st.stop()
 
     # =============================================
