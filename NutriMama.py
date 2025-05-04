@@ -1,18 +1,16 @@
 import streamlit as st
 from datetime import datetime
-from PIL import Image
 import os
-from pathlib import Path
 
-# =============================================
+# ================================================
 # INITIALIZE SESSION STATE
-# =============================================
+# ================================================
 if 'user_profile' not in st.session_state:
     st.session_state.user_profile = None
 
-# =============================================
+# ================================================
 # STYLE CONFIGURATION (IMPROVED UI)
-# =============================================
+# ================================================
 def set_ui_theme():
     st.set_page_config(
         layout="wide",
@@ -63,25 +61,13 @@ def set_ui_theme():
             color: #666666;
             font-size: 16px;
         }}
-        
-        /* Logo container - UPDATED FOR PERFECT CENTERING */
-        .logo-container {{
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            margin: 0 auto 20px auto;
-        }}
     </style>
     """, unsafe_allow_html=True)
 
-
-
-# =============================================
+# ================================================
 # ONBOARDING FLOW
-# =============================================
+# ================================================
 def show_onboarding():
-
     st.markdown("""
     <div style='background-color: #F8FBFF; border-radius: 12px; padding: 30px; 
                 text-align: center; margin-bottom: 40px;'>
@@ -109,12 +95,14 @@ def show_onboarding():
             )
         
         with col2:
-            bf_stage = st.radio(
-                "Breastfeeding Stage*",
+            # Breastfeeding Stage as duration (0-6 months, 6-12 months, etc.)
+            bf_duration = st.selectbox(
+                "Breastfeeding Duration*",
                 options=["0-6 Months", "6-12 Months", "12+ Months"],
                 index=0
             )
             
+            # Health considerations (optional)
             conditions = st.multiselect(
                 "Health Considerations (Optional)",
                 options=["Diabetes", "Hypertension", "PCOS", "Thyroid Issues"],
@@ -124,26 +112,104 @@ def show_onboarding():
         submitted = st.form_submit_button("Begin Your Journey →")
     
     if submitted:
-        if not all([name, age, region, bf_stage]):
+        if not all([name, age, region, bf_duration]):
             st.error("Please fill all required fields (*)")
         else:
+            # Mapping breastfeeding duration to stage for model
+            bf_stage_mapping = {
+                "0-6 Months": "Lactation",
+                "6-12 Months": "Weaning",
+                "12+ Months": "Extended"
+            }
+            bf_stage = bf_stage_mapping[bf_duration]
+            
+            # Save the user profile in session state
             st.session_state.user_profile = {
                 "name": name,
                 "age": age,
                 "region": region,
-                "bf_stage": bf_stage,
+                "bf_duration": bf_duration,  # We store duration in the profile
+                "bf_stage": bf_stage,        # We store internal stage in the profile
                 "conditions": conditions,
                 "onboarded_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             }
             st.success("Profile saved successfully!")
-            st.switch_page("pages/1_Home.py")
+            # Now, pass to the plan page with user profile data
+            st.experimental_rerun()
 
-# =============================================
+# ================================================
+# PLAN PAGE (Calling Model API)
+# ================================================
+def show_plan_page():
+    if 'user_profile' not in st.session_state or st.session_state.user_profile is None:
+        st.error("No user profile found. Please complete the onboarding process.")
+        return
+
+    # Display user profile data (allow user to edit if needed)
+    user_profile = st.session_state.user_profile
+    st.write(f"### User Profile:")
+    name = st.text_input("Name", user_profile['name'])
+    age = st.selectbox("Age Group", ["18-25", "26-35", "36-45", "45+"], index=["18-25", "26-35", "36-45", "45+"].index(user_profile['age']))
+    region = st.selectbox("Region", ["North America", "South Asia", "Africa", "Europe", "Other"], index=["North America", "South Asia", "Africa", "Europe", "Other"].index(user_profile['region']))
+    bf_duration = st.selectbox("Breastfeeding Duration", ["0-6 Months", "6-12 Months", "12+ Months"], index=["0-6 Months", "6-12 Months", "12+ Months"].index(user_profile['bf_duration']))
+    conditions = st.multiselect("Health Considerations (Optional)", options=["Diabetes", "Hypertension", "PCOS", "Thyroid Issues"], default=user_profile['conditions'])
+
+    # Update session state if changes are made
+    if st.button("Update Profile"):
+        # Map the breastfeeding duration to stage again (in case it was changed)
+        bf_stage_mapping = {
+            "0-6 Months": "Lactation",
+            "6-12 Months": "Weaning",
+            "12+ Months": "Extended"
+        }
+        bf_stage = bf_stage_mapping[bf_duration]
+        
+        st.session_state.user_profile = {
+            "name": name,
+            "age": age,
+            "region": region,
+            "bf_duration": bf_duration,
+            "bf_stage": bf_stage,
+            "conditions": conditions,
+            "onboarded_at": user_profile["onboarded_at"]
+        }
+        st.success("Profile updated successfully!")
+
+    # Call model API and display nutrition plan
+    if st.button("Get Nutrition Plan"):
+        # Example API call to your backend
+        profile_data = {
+            "age": age,
+            "region": region,
+            "stage": user_profile["bf_stage"],  # Use the internal stage (Lactation, Weaning, Extended)
+            "conditions": conditions
+        }
+        
+        # Call model API or backend here (Assuming you have an API endpoint for model prediction)
+        # result = api_call_to_model(profile_data)
+        
+        # Display the result (Here we mock the response)
+        mock_response = {
+            "personalized_plan": "Balanced diet + hydration",
+            "meal_ideas": ["Fruits, grains, milk", "Soup and veggies"],
+            "tips": ["Ensure hydration", "Include local, seasonal foods"]
+        }
+        
+        st.write(f"### Nutrition Plan: {mock_response['personalized_plan']}")
+        st.write("#### Meal Ideas:")
+        for meal in mock_response['meal_ideas']:
+            st.write(f"- {meal}")
+        st.write("#### Tips:")
+        for tip in mock_response['tips']:
+            st.write(f"- {tip}")
+
+# ================================================
 # MAIN APP FLOW
-# =============================================
+# ================================================
 set_ui_theme()
 
 if not st.session_state.user_profile:
     show_onboarding()
 else:
-    st.switch_page("pages/1_Home.py")
+    # Call the plan page
+    show_plan_page()
