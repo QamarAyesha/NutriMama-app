@@ -15,19 +15,11 @@ st.set_page_config(
 )
 
 # =============================================
-# SESSION CHECK: Redirect if no profile
+# SESSION CHECK: Show message if no profile
 # =============================================
 if 'user_profile' not in st.session_state or not st.session_state.user_profile:
     st.warning("🚨 Please complete onboarding first.")
     st.markdown("👉 Click **'NutriMama'** in the left menu to begin onboarding.")
-    
-    with st.expander("Or complete quick onboarding here:"):
-        name = st.text_input("Enter your name to begin onboarding:")
-        if name:
-            st.session_state.user_profile = {"name": name}
-            st.success("✅ Onboarding complete. Please reload this page.")
-            st.stop()
-
     st.stop()
 
 # =============================================
