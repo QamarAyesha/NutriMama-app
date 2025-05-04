@@ -55,6 +55,7 @@ with st.form("update_profile_form"):
     submitted = st.form_submit_button("Update Profile")
 
     if submitted:
+        # Map breastfeeding duration to breastfeeding stage
         bf_stage_mapping = {
             "0-6 Months": "Lactation",
             "6-12 Months": "Weaning",
@@ -62,13 +63,25 @@ with st.form("update_profile_form"):
         }
         bf_stage = bf_stage_mapping.get(bf_duration, "Lactation")
 
+        # Health Condition Mapping - Map invalid conditions to "None"
+        valid_condition_mapping = {
+            "PCOS": "None",
+            "Hypertension": "Hypertension",
+            "Diabetes": "Diabetes",
+            "Thyroid Issues": "Thyroid",
+        }
+
+        # Map user's selected conditions to the valid conditions
+        mapped_conditions = [valid_condition_mapping.get(cond, "None") for cond in conditions]
+
+        # Update the user profile in session state
         st.session_state.user_profile = {
             "name": user_profile["name"],
             "age": age,
             "region": region,
             "bf_duration": bf_duration,
             "bf_stage": bf_stage,
-            "conditions": conditions,
+            "conditions": mapped_conditions,
             "onboarded_at": user_profile.get("onboarded_at", "")
         }
         st.success("✅ Profile updated successfully!")
@@ -82,11 +95,15 @@ if st.button("Get Meal Plan"):
         try:
             client = Client("ayeshaqamar/nutrition-api")
 
+            # Join the mapped health conditions into a string
+            model_conditions_str = ", ".join(profile["conditions"])
+
+            # Get the model prediction using the user profile data
             result = client.predict(
                 age=profile["age"],
                 region=profile["region"],
-                stage=profile["bf_stage"],
-                health_condition=", ".join(profile["conditions"]),
+                stage=profile["bf_stage"],  # Use mapped bf_stage
+                health_condition=model_conditions_str,  # Send the mapped health conditions
                 api_name="/predict"
             )
 
