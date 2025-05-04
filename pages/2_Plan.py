@@ -1,6 +1,7 @@
 import streamlit as st
-import requests
+from gradio_client import Client
 
+# Set up page configuration
 st.set_page_config(page_title="Meal Plan for Nursing Mothers", layout="centered")
 
 st.title("Meal Plan Recommender for Nursing Mothers")
@@ -16,31 +17,48 @@ health_condition = st.selectbox("Health condition", ["None", "Anemia", "Diabetes
 if st.button("Get Meal Plan"):
     with st.spinner("Fetching your personalized meal plan..."):
         try:
-            # Prepare input for Gradio API
-            payload = {
-                "data": [age, region, stage, health_condition]
-            }
-
-            response = requests.post(
-                "https://ayeshaqamar-nutrition-api.hf.space/run/predict",
-                json=payload
+            # Use Gradio Client to interact with the Hugging Face Space API
+            client = Client("ayeshaqamar/nutrition-api")
+            result = client.predict(
+                age=age,
+                region=region,
+                stage=stage,
+                health_condition=health_condition,
+                api_name="/predict"
             )
 
-            if response.status_code == 200:
-                result = response.json()
-                output = result["data"][0]  # Adjust this based on your return format
-
-                st.success(f"Recommended Plan: **{output['plan']}**")
+            # Check the result and display the response
+            if result:
+                st.success(f"Recommended Plan: **{result[0]['plan']}**")
 
                 st.subheader("🍽️ Meal Ideas")
-                for meal in output.get("meal_ideas", []):
+                for meal in result[0].get("meal_ideas", []):
                     st.markdown(f"- {meal}")
 
                 st.subheader("🧠 Tips")
-                for tip in output.get("tips", []):
+                for tip in result[0].get("tips", []):
                     st.markdown(f"- {tip}")
-            else:
-                st.error(f"❌ API Error: {response.text}")
 
         except Exception as e:
-            st.error(f"⚠️ Error: {str(e)}")
+            # Fallback response for testing if API fails
+            st.warning("⚠️ API request failed. Showing default fallback data for testing.")
+            
+            # Default fallback data
+            fallback_data = {
+                "plan": "General balanced diet (test fallback)",
+                "meal_ideas": ["Rice + lentils", "Seasonal veggies", "Boiled eggs"],
+                "tips": [
+                    "⚠️ This is a fallback response (model not loaded).",
+                    "Use this only for frontend testing.",
+                    "Ensure you upload the trained model to enable real predictions."
+                ]
+            }
+
+            st.success(f"Recommended Plan: **{fallback_data['plan']}**")
+            st.subheader("🍽️ Meal Ideas")
+            for meal in fallback_data["meal_ideas"]:
+                st.markdown(f"- {meal}")
+
+            st.subheader("🧠 Tips")
+            for tip in fallback_data["tips"]:
+                st.markdown(f"- {tip}")
