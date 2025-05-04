@@ -1,17 +1,19 @@
 import streamlit as st
 from datetime import datetime
 
-# =======================
-# INITIAL STATE
-# =======================
+# ==============================================
+# INITIALIZE SESSION STATE
+# ==============================================
 if 'user_profile' not in st.session_state:
     st.session_state.user_profile = None
-if 'onboarding_complete' not in st.session_state:
-    st.session_state.onboarding_complete = False
+if 'show_onboarding' not in st.session_state:
+    st.session_state.show_onboarding = True
+if 'trigger_redirect' not in st.session_state:
+    st.session_state.trigger_redirect = False
 
-# =======================
-# PAGE SETUP
-# =======================
+# ==============================================
+# STYLE CONFIGURATION (IMPROVED UI)
+# ==============================================
 def set_ui_theme():
     st.set_page_config(
         layout="wide",
@@ -20,20 +22,20 @@ def set_ui_theme():
         page_icon="🤱"
     )
 
-    st.markdown("""
+    st.markdown(f"""
     <style>
-        .stApp {
+        .stApp {{
             background: linear-gradient(135deg, #F8FBFF, #E4F0F6);
-        }
-        .stContainer, .stExpander {
+        }}
+        .stContainer, .stExpander {{
             background-color: #FFFFFF;
             border-radius: 12px;
             padding: 30px;
             box-shadow: 0 6px 12px rgba(0,0,0,0.1);
             margin-bottom: 20px;
             border: 1px solid #E6F1F7;
-        }
-        .stButton>button {
+        }}
+        .stButton>button {{
             background-color: #FFB996;
             color: #333333;
             border-radius: 8px;
@@ -42,32 +44,32 @@ def set_ui_theme():
             border: none;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
             transition: all 0.3s ease;
-        }
-        .stButton>button:hover {
+        }}
+        .stButton>button:hover {{
             background-color: #FF9C85;
             transform: scale(1.05);
-        }
-        h1, h2, h3 {
+        }}
+        h1, h2, h3 {{
             color: #333333;
             font-family: 'Arial', sans-serif;
-        }
-        p {
+        }}
+        p {{
             color: #666666;
             font-size: 16px;
-        }
-        .logo-container {
+        }}
+        .logo-container {{
             display: flex;
             justify-content: center;
             align-items: center;
             width: 100%;
             margin: 0 auto 20px auto;
-        }
+        }}
     </style>
     """, unsafe_allow_html=True)
 
-# =======================
-# ONBOARDING FORM
-# =======================
+# ==============================================
+# ONBOARDING FLOW
+# ==============================================
 def show_onboarding():
     st.markdown("""
     <div style='background-color: #F8FBFF; border-radius: 12px; padding: 30px; 
@@ -114,7 +116,7 @@ def show_onboarding():
         if not all([name, age, region, bf_stage]):
             st.error("Please fill all required fields (*)")
         else:
-            # Map the stage to model input
+            # Map to model-friendly stage labels
             stage_map = {
                 "0-6 Months": "Lactation",
                 "6-12 Months": "Weaning",
@@ -130,27 +132,27 @@ def show_onboarding():
                 "onboarded_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             }
 
-            st.session_state.onboarding_complete = True
+            st.session_state.trigger_redirect = True
+            st.experimental_rerun()
 
-# =======================
-# MAIN FLOW
-# =======================
+# ==============================================
+# MAIN APP FLOW
+# ==============================================
 set_ui_theme()
 
-# Show onboarding
-if not st.session_state.user_profile:
-    show_onboarding()
-
-# After successful onboarding
-elif st.session_state.onboarding_complete:
+# Redirect after successful onboarding
+if st.session_state.trigger_redirect:
+    st.session_state.trigger_redirect = False
     st.success("✅ Profile saved successfully!")
     if st.button("OK → Go to Home"):
-        st.session_state.onboarding_complete = False
+        st.session_state.show_onboarding = False
         st.switch_page("pages/1_Home.py")
 
-# Already onboarded users revisiting main page
+# Show onboarding or main screen
+elif st.session_state.show_onboarding:
+    show_onboarding()
 else:
-    st.write(f"👋 Welcome back, **{st.session_state.user_profile['name']}**!")
-    st.write("You're ready to get your personalized meal plan.")
-    if st.button("Go to Home"):
-        st.switch_page("pages/1_Home.py")
+    st.write(f"Welcome back, {st.session_state.user_profile['name']}!")
+    st.write("You're ready to get your personalized meal plan!")
+    if st.button("Go to Meal Plan Page"):
+        st.switch_page("pages/2_Plan.py")  # Assuming this is the meal plan page
