@@ -19,7 +19,10 @@ st.set_page_config(
 # =============================================
 if 'user_profile' not in st.session_state or not st.session_state.user_profile:
     st.warning("🚨 Please complete onboarding first.")
-    st.switch_page("Nutrimama.py")  # Assumes Nutrimama.py is the main onboarding page
+    if st.button("Go to NutriMama (Complete Onboarding)"):
+        st.session_state.show_onboarding = True  # Trigger onboarding
+        st.experimental_rerun()  # Force re-render and redirect to onboarding page
+    st.stop()  # Stop further execution of the page content
 
 # =============================================
 # STYLE CONFIGURATION
