@@ -80,6 +80,7 @@ st.write(f"**Health Conditions:** {', '.join(user_profile['conditions']) if user
 # =============================================
 # EDIT PROFILE OPTION
 # =============================================
+# Edit Profile Option
 edit_profile = st.button("✏️ Edit Profile")
 
 if edit_profile:
@@ -87,6 +88,7 @@ if edit_profile:
         with st.form("update_profile_form"):
             st.subheader("🔄 Update Profile")
 
+            # Define options and get selected values
             age_options = ["18-25", "26-35", "36-45", "45+"]
             region_options = ["North America", "South Asia", "Africa", "Europe", "Middle East", "Other"]
             bf_duration_options = ["0-6 Months", "6-12 Months", "12+ Months"]
@@ -97,9 +99,11 @@ if edit_profile:
             bf_duration = st.selectbox("Breastfeeding Duration", bf_duration_options, index=bf_duration_options.index(user_profile["bf_duration"]))
             conditions = st.multiselect("Health Conditions (Optional)", options=condition_options, default=user_profile["conditions"])
 
+            # Form submit button
             submitted = st.form_submit_button("✅ Update Profile")
 
             if submitted:
+                # Map to breastfeeding stage
                 bf_stage_mapping = {
                     "0-6 Months": "Lactation",
                     "6-12 Months": "Weaning",
@@ -107,7 +111,6 @@ if edit_profile:
                 }
                 bf_stage = bf_stage_mapping.get(bf_duration, "Lactation")
 
-                # No remapping necessary, pass directly
                 mapped_conditions = conditions
 
                 # Update session state
@@ -120,10 +123,8 @@ if edit_profile:
                     "conditions": mapped_conditions,
                     "onboarded_at": user_profile.get("onboarded_at", "")
                 }
-                 # Debugging: Confirm profile update
-                st.write(f"Updated Profile: {st.session_state.user_profile}")  # Debugging step
                 st.success("✅ Profile updated successfully!")
-                st.rerun()  # 🚀 Trigger UI refresh
+                st.rerun()  # Trigger UI refresh to reflect new session state
 
 # =============================================
 # GET MEAL PLAN
