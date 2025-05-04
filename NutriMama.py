@@ -9,6 +9,8 @@ from pathlib import Path
 # ==============================================
 if 'user_profile' not in st.session_state:
     st.session_state.user_profile = None
+if 'show_onboarding' not in st.session_state:
+    st.session_state.show_onboarding = True  # Set this to True initially to show onboarding
 
 # ==============================================
 # STYLE CONFIGURATION (IMPROVED UI)
@@ -124,6 +126,7 @@ def show_onboarding():
         if not all([name, age, region, bf_stage]):
             st.error("Please fill all required fields (*)")
         else:
+            # Save profile in session state
             st.session_state.user_profile = {
                 "name": name,
                 "age": age,
@@ -133,25 +136,19 @@ def show_onboarding():
                 "onboarded_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             }
             st.success("Profile saved successfully!")
-            st.session_state.show_onboarding = False  # User profile saved, don't show onboarding next time
-
-            # Switch to the home page after onboarding
-            st.experimental_rerun()  # Ensure the app refreshes after profile is saved
+            # Update session state flag to indicate that onboarding is complete
+            st.session_state.show_onboarding = False
 
 # ==============================================
 # MAIN APP FLOW
 # ==============================================
 set_ui_theme()
 
-# Check if the user has completed onboarding (based on session state)
-if not st.session_state.user_profile:
+# Show onboarding or skip to the main app depending on whether the user has completed onboarding
+if st.session_state.show_onboarding:
     show_onboarding()
 else:
+    # Show the home page or the main content after onboarding is complete
     st.write(f"Welcome back, {st.session_state.user_profile['name']}!")
-    # Now that onboarding is done, show the Home page (or another page)
-    # You can switch to another page or continue the app here
     st.write("You're ready to get your personalized meal plan!")
-    # Assuming you're using a Streamlit multi-page setup
-    # st.experimental_set_query_params(page="home")  # Optional for multi-page setups
-    # Or use `st.switch_page("pages/1_Home.py")` if using multiple pages setup
-    st.button("Go to Meal Plan Page")  # Placeholder action for redirecting
+    st.button("Go to Meal Plan Page")  # Placeholder action for redirecting to another page
