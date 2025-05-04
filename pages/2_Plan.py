@@ -111,7 +111,7 @@ st.write(f"**Health Conditions:** {', '.join(user_profile['conditions']) if user
 # =============================================
 # EDIT PROFILE OPTION
 # =============================================
-edit_profile = st.button("✏Edit Profile")
+edit_profile = st.button("Edit Profile")
 
 if edit_profile:
     with st.expander("Update Your Profile Information", expanded=True):
