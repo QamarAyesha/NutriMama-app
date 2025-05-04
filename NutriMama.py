@@ -139,5 +139,5 @@ elif st.session_state.show_onboarding:
 else:
     st.write(f"Welcome back, {st.session_state.user_profile['name']}!")
     st.write("You're ready to get your personalized meal plan!")
-    if st.button("Go to Meal Plan Page"):
-        st.switch_page("pages/2_Plan.py")
+    if st.button("Go to NutriMama application"):
+        st.switch_page("pages/1_Home.py")
