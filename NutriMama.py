@@ -89,8 +89,11 @@ def show_onboarding():
             region = st.selectbox("Region*", ["North America", "South Asia", "Africa", "Europe", "Other"], index=0)
 
         with col2:
-            bf_stage = st.radio(
-                "Breastfeeding Stage*", ["0-6 Months", "6-12 Months", "12+ Months"], index=0
+            # Now using bf_duration instead of bf_stage
+            bf_duration = st.selectbox(
+                "Breastfeeding Duration*",
+                ["0-6 Months", "6-12 Months", "12+ Months"],
+                index=0
             )
             conditions = st.multiselect(
                 "Health Considerations (Optional)",
@@ -101,20 +104,23 @@ def show_onboarding():
         submitted = st.form_submit_button("Begin Your Journey →")
 
         if submitted:
-            if not all([name, age, region, bf_stage]):
+            if not all([name, age, region, bf_duration]):
                 st.error("Please fill all required fields (*)")
             else:
-                stage_map = {
+                # Map breastfeeding duration to stage for internal use
+                bf_stage_mapping = {
                     "0-6 Months": "Lactation",
                     "6-12 Months": "Weaning",
                     "12+ Months": "Extended"
                 }
 
+                # Save user profile with the mapped bf_stage
                 st.session_state.user_profile = {
                     "name": name,
                     "age": age,
                     "region": region,
-                    "bf_stage": stage_map.get(bf_stage, "Lactation"),
+                    "bf_duration": bf_duration,  # Save the bf_duration
+                    "bf_stage": bf_stage_mapping.get(bf_duration, "Lactation"),  # Map to bf_stage
                     "conditions": conditions,
                     "onboarded_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 }
