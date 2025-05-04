@@ -1,2 +1,13 @@
 [theme]
 base = "light"
+
+[server]
+headless = true
+maxUploadSize = 200  # Set max upload size limit for user-uploaded files, can be adjusted as needed
+
+# Optional: Limit file watching to certain files/folders if you have unnecessary files
+fileWatcherBlacklist = "some_folder_name_or_pattern"  # Ignore specific files or directories
+
+[runner]
+# Limit the max memory usage for apps
+# maxMemory = 512
