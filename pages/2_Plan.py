@@ -7,45 +7,75 @@ from datetime import datetime
 # =============================================
 st.set_page_config(page_title="Meal Plan for Nursing Mothers", layout="wide", page_icon="🍽️")
 
-st.markdown("""
+st.markdown(
+    """
     <style>
-    .stApp {
-        background: linear-gradient(135deg, #F8FBFF, #E4F0F6);
+    body {
+        background-color: #f5f9fc;
+        font-family: Arial, sans-serif;
     }
-    .stContainer, .stExpander {
-        background-color: #FFFFFF;
-        border-radius: 12px;
-        padding: 30px;
-        box-shadow: 0 6px 12px rgba(0,0,0,0.1);
-        margin-bottom: 20px;
-        border: 1px solid #E6F1F7;
+    .main {
+        background-color: #f5f9fc;
+        padding: 1rem;
     }
-    .stButton>button {
-        background-color: #FFB996;
-        color: #333333;
-        border-radius: 8px;
-        font-weight: 600;
-        padding: 12px 20px;
+    .entry {
+        background-color: #f0f4f8;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border-radius: 16px;
+        position: relative;
+    }
+    .delete-btn {
+        position: absolute;
+        top: 0.5rem;
+        right: 0.5rem;
+        background: #ff6b6b;
+        color: white;
         border: none;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        transition: all 0.3s ease;
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        font-size: 12px;
+        cursor: pointer;
     }
-    .stButton>button:hover {
-        background-color: #FF9C85;
-        transform: scale(1.05);
+    button[kind="primary"] {
+        background-color: #f9c8a7;
+        color: #333333;
+        font-weight: 600;
+        border-radius: 12px;
+        padding: 0.5rem 1rem;
+        border: none;
     }
     h1, h2, h3 {
-        color: #333333;
-        font-family: 'Arial', sans-serif;
+        color: #1f2937;
     }
-    p {
-        color: #666666;
-        font-size: 16px;
+    label, p {
+        color: #374151;
+    }
+    .stButton>button {
+        background-color: #f9c8a7;
+        color: #333333;
+        font-weight: 600;
+        border-radius: 12px;
+        padding: 0.5rem 1rem;
+        border: none;
+    }
+    .header-icon {
+        vertical-align: middle;
+        margin-right: 10px;
+    }
+    /* Media query for responsiveness */
+    @media (max-width: 768px) {
+        .entry {
+            font-size: 14px;
+        }
     }
     </style>
-""", unsafe_allow_html=True)
+    """,
+    unsafe_allow_html=True
+)
 
-st.title("🥗 Meal Plan Recommender for Nursing Mothers")
+st.title("Meal Plan Recommender for Nursing Mothers")
 st.markdown("Get a personalized meal recommendation based on your **region**, **age**, and **health conditions**.")
 
 # =============================================
@@ -71,7 +101,7 @@ for key in required_keys:
 # =============================================
 # DISPLAY PROFILE
 # =============================================
-st.write("### 👤 Your Current Profile")
+st.write("### Your Current Profile")
 st.write(f"**Name:** {user_profile['name']}")
 st.write(f"**Age Group:** {user_profile['age']}")
 st.write(f"**Region:** {user_profile['region']}")
@@ -81,7 +111,7 @@ st.write(f"**Health Conditions:** {', '.join(user_profile['conditions']) if user
 # =============================================
 # EDIT PROFILE OPTION
 # =============================================
-edit_profile = st.button("✏️ Edit Profile")
+edit_profile = st.button("✏Edit Profile")
 
 if edit_profile:
     with st.expander("Update Your Profile Information", expanded=True):
@@ -146,7 +176,7 @@ if edit_profile:
 # GET MEAL PLAN
 # =============================================
 st.markdown("---")
-if st.button("📥 Get Meal Plan"):
+if st.button("Get Meal Plan"):
     profile = st.session_state.user_profile
     with st.spinner("Fetching your personalized meal plan..."):
         try:
@@ -170,7 +200,7 @@ if st.button("📥 Get Meal Plan"):
                     st.markdown(f"- {meal}")
 
             if result.get("tips"):
-                st.subheader("🧠 Tips")
+                st.subheader("Tips")
                 for tip in result["tips"]:
                     st.markdown(f"- {tip}")
 
