@@ -126,6 +126,14 @@ def show_onboarding():
         if not all([name, age, region, bf_stage]):
             st.error("Please fill all required fields (*)")
         else:
+            # Map the age group to a more suitable model stage if needed
+            if bf_stage == "0-6 Months":
+                bf_stage = "Lactation"
+            elif bf_stage == "6-12 Months":
+                bf_stage = "Weaning"
+            elif bf_stage == "12+ Months":
+                bf_stage = "Extended"
+
             # Save profile in session state
             st.session_state.user_profile = {
                 "name": name,
@@ -136,6 +144,7 @@ def show_onboarding():
                 "onboarded_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             }
             st.success("Profile saved successfully!")
+            
             # Update session state flag to indicate that onboarding is complete
             st.session_state.show_onboarding = False
 
@@ -151,4 +160,9 @@ else:
     # Show the home page or the main content after onboarding is complete
     st.write(f"Welcome back, {st.session_state.user_profile['name']}!")
     st.write("You're ready to get your personalized meal plan!")
-    st.button("Go to Meal Plan Page")  # Placeholder action for redirecting to another page
+    
+    # Button to navigate to the meal plan page (or another page)
+    if st.button("Go to Meal Plan Page"):
+        # You can replace this with a page switch or redirection logic (like `st.experimental_rerun()` or `st.switch_page('plan')`)
+        st.session_state.show_onboarding = False  # Hide onboarding page if present
+        st.experimental_rerun()  # This will rerun and can be used for page switching or redirection
