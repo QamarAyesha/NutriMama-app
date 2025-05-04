@@ -17,17 +17,13 @@ def community_page():
             background-color: #f5f9fc;
             font-family: 'Arial', sans-serif;
         }
-        .stButton>button {
+       .stButton>button {
             background-color: #f9c8a7;
             color: #333333;
+            font-weight: 600;
             border-radius: 12px;
             padding: 0.5rem 1rem;
             border: none;
-            font-weight: 600;
-            margin-top: 10px;
-        }
-        .stButton>button:hover {
-            background-color: #e8b49d;
         }
         .stTextInput, .stTextArea {
             background-color: #ffffff;
