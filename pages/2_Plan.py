@@ -5,7 +5,7 @@ from datetime import datetime
 # =============================================
 # PAGE CONFIG & THEME
 # =============================================
-st.set_page_config(page_title="Meal Plan for Nursing Mothers", layout="wide", page_icon="🍽️")
+st.set_page_config(page_title="Meal Plan", layout="wide", page_icon="🍽️")
 
 st.markdown(
     """
@@ -75,7 +75,7 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-st.title("Meal Plan Recommender for Nursing Mothers")
+st.title("Meal Plan Recommender")
 st.markdown("Get a personalized meal recommendation based on your **region**, **age**, and **health conditions**.")
 
 # =============================================
