@@ -114,6 +114,7 @@ def show_onboarding():
         if not all([name, age, region, bf_stage]):
             st.error("Please fill all required fields (*)")
         else:
+            # Map the stage to model input
             stage_map = {
                 "0-6 Months": "Lactation",
                 "6-12 Months": "Weaning",
@@ -130,25 +131,24 @@ def show_onboarding():
             }
 
             st.session_state.onboarding_complete = True
-            st.experimental_rerun()  # Re-render to show success state
 
 # =======================
 # MAIN FLOW
 # =======================
 set_ui_theme()
 
-# CASE 1: Show onboarding
+# Show onboarding
 if not st.session_state.user_profile:
     show_onboarding()
 
-# CASE 2: Just finished onboarding
+# After successful onboarding
 elif st.session_state.onboarding_complete:
     st.success("✅ Profile saved successfully!")
     if st.button("OK → Go to Home"):
-        st.session_state.onboarding_complete = False  # reset
+        st.session_state.onboarding_complete = False
         st.switch_page("pages/1_Home.py")
 
-# CASE 3: Already onboarded user revisiting
+# Already onboarded users revisiting main page
 else:
     st.write(f"👋 Welcome back, **{st.session_state.user_profile['name']}**!")
     st.write("You're ready to get your personalized meal plan.")
