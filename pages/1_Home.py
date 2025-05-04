@@ -19,10 +19,16 @@ st.set_page_config(
 # =============================================
 if 'user_profile' not in st.session_state or not st.session_state.user_profile:
     st.warning("🚨 Please complete onboarding first.")
-    if st.button("Go to NutriMama (Complete Onboarding)"):
-        st.session_state.show_onboarding = True  # Trigger onboarding
-        st.rerun()  # Use the updated rerun method
-    st.stop()  # Stop further execution of the page content
+    st.markdown("👉 Click **'NutriMama'** in the left menu to begin onboarding.")
+    
+    with st.expander("Or complete quick onboarding here:"):
+        name = st.text_input("Enter your name to begin onboarding:")
+        if name:
+            st.session_state.user_profile = {"name": name}
+            st.success("✅ Onboarding complete. Please reload this page.")
+            st.stop()
+
+    st.stop()
 
 # =============================================
 # STYLE CONFIGURATION
@@ -146,6 +152,12 @@ def display_safety_results(data):
         for alt in data["alternatives"]:
             st.markdown(f"- {alt}")
 
+def meal_plan_redirect():
+    st.subheader("🥗 Personalized Meal Plan")
+    st.write("Based on your onboarding info, view your tailored daily plan.")
+    if st.button("View My Personalized Meal Plan"):
+        st.switch_page("pages/2_Plan.py")
+
 # =============================================
 # MAIN APP FUNCTION
 # =============================================
@@ -157,6 +169,8 @@ def main():
     daily_tip()
     st.divider()
     medication_safety_section()
+    st.divider()
+    meal_plan_redirect()
 
 if __name__ == "__main__":
     main()
