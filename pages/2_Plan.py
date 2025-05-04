@@ -83,7 +83,7 @@ st.markdown("Get a personalized meal recommendation based on your **region**, **
 # =============================================
 if 'user_profile' not in st.session_state or not st.session_state.user_profile:
     st.warning("🚨 Please complete onboarding first.")
-    st.markdown("👉 Click **'NutriMama'** in the left menu to begin onboarding.")
+    st.markdown("Click **'NutriMama'** in the left menu to begin onboarding.")
     st.stop()
 
 # =============================================
@@ -95,7 +95,7 @@ required_keys = ['age', 'region', 'bf_duration', 'bf_stage', 'conditions']
 for key in required_keys:
     if key not in user_profile:
         st.error(f"⚠️ Missing key in user profile: `{key}`. Please redo onboarding.")
-        st.markdown("👉 Click **'NutriMama'** in the left menu to begin onboarding.")
+        st.markdown("Click **'NutriMama'** in the left menu to begin onboarding.")
         st.stop()
 
 # =============================================
@@ -116,7 +116,7 @@ edit_profile = st.button("✏Edit Profile")
 if edit_profile:
     with st.expander("Update Your Profile Information", expanded=True):
         with st.form("update_profile_form"):
-            st.subheader("🔄 Update Profile")
+            st.subheader("Update Profile")
 
             # Define options
             age_options = ["18-25", "26-35", "36-45", "45+"]
@@ -138,7 +138,7 @@ if edit_profile:
             conditions = st.multiselect("Health Conditions (Optional)", options=condition_options, default=user_profile["conditions"])
 
             # Form submit button
-            submitted = st.form_submit_button("✅ Update Profile")
+            submitted = st.form_submit_button("Update Profile")
 
             if submitted:
                 st.write("DEBUG: Form submitted")
@@ -169,7 +169,7 @@ if edit_profile:
 
                     # Debug after update
                     st.write("DEBUG: After update", st.session_state.user_profile)
-                    st.success("✅ Profile updated successfully!")
+                    st.success("Profile updated successfully!")
                     # st.rerun()  # Comment out for testing
 
 # =============================================
