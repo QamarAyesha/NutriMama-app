@@ -1,9 +1,51 @@
 import streamlit as st
 from gradio_client import Client
 
-st.set_page_config(page_title="Meal Plan for Nursing Mothers", layout="centered")
-st.title("Meal Plan Recommender for Nursing Mothers")
-st.markdown("Get a personalized meal recommendation based on your region, age, and health.")
+# =============================================
+# PAGE CONFIG & THEME
+# =============================================
+st.set_page_config(page_title="Meal Plan for Nursing Mothers", layout="wide", page_icon="🍽️")
+
+st.markdown("""
+    <style>
+    .stApp {
+        background: linear-gradient(135deg, #F8FBFF, #E4F0F6);
+    }
+    .stContainer, .stExpander {
+        background-color: #FFFFFF;
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+        border: 1px solid #E6F1F7;
+    }
+    .stButton>button {
+        background-color: #FFB996;
+        color: #333333;
+        border-radius: 8px;
+        font-weight: 600;
+        padding: 12px 20px;
+        border: none;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+    }
+    .stButton>button:hover {
+        background-color: #FF9C85;
+        transform: scale(1.05);
+    }
+    h1, h2, h3 {
+        color: #333333;
+        font-family: 'Arial', sans-serif;
+    }
+    p {
+        color: #666666;
+        font-size: 16px;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+st.title("🥗 Meal Plan Recommender for Nursing Mothers")
+st.markdown("Get a personalized meal recommendation based on your **region**, **age**, and **health conditions**.")
 
 # =============================================
 # SESSION CHECK
@@ -18,7 +60,6 @@ if 'user_profile' not in st.session_state or not st.session_state.user_profile:
 # =============================================
 user_profile = st.session_state.user_profile
 
-# Ensure required fields exist (handle older profiles or partial updates)
 required_keys = ['age', 'region', 'bf_duration', 'bf_stage', 'conditions']
 for key in required_keys:
     if key not in user_profile:
@@ -27,42 +68,38 @@ for key in required_keys:
         st.stop()
 
 # =============================================
-# DISPLAY PROFILE SUMMARY
+# DISPLAY PROFILE
 # =============================================
-st.write("### Your Current Profile:")
-st.write(f"Name: {user_profile['name']}")
-st.write(f"Age Group: {user_profile['age']}")
-st.write(f"Region: {user_profile['region']}")
-st.write(f"Breastfeeding Duration: {user_profile['bf_duration']} (Internal Stage: {user_profile['bf_stage']})")
-st.write(f"Health Conditions: {', '.join(user_profile['conditions']) if user_profile['conditions'] else 'None'}")
+st.write("### 👤 Your Current Profile")
+st.write(f"**Name:** {user_profile['name']}")
+st.write(f"**Age Group:** {user_profile['age']}")
+st.write(f"**Region:** {user_profile['region']}")
+st.write(f"**Breastfeeding Duration:** {user_profile['bf_duration']} _(Stage: {user_profile['bf_stage']})_")
+st.write(f"**Health Conditions:** {', '.join(user_profile['conditions']) if user_profile['conditions'] else 'None'}")
 
 # =============================================
-# EDIT PROFILE BUTTON & FORM (Hidden by Default)
+# EDIT PROFILE OPTION
 # =============================================
-# Button to toggle editing profile
-edit_profile = st.button("Edit Profile")
+edit_profile = st.button("✏️ Edit Profile")
 
 if edit_profile:
-    with st.expander("Update Your Profile Information", expanded=True):  # Expand form only when clicked
-        # Form to update profile
+    with st.expander("Update Your Profile Information", expanded=True):
         with st.form("update_profile_form"):
-            st.subheader("Update Profile")
+            st.subheader("🔄 Update Profile")
 
             age_options = ["18-25", "26-35", "36-45", "45+"]
-            region_options = ["North America", "South Asia", "Africa", "Europe", "Other"]
+            region_options = ["North America", "South Asia", "Africa", "Europe", "Middle East", "Other"]
             bf_duration_options = ["0-6 Months", "6-12 Months", "12+ Months"]
-            condition_options = ["Diabetes", "Hypertension", "PCOS", "Thyroid Issues"]
+            condition_options = ["Anemia", "Diabetes", "Thyroid", "PCOS", "Hypertension", "Obesity", "Cholesterol", "None"]
 
             age = st.selectbox("Age Group", age_options, index=age_options.index(user_profile["age"]))
             region = st.selectbox("Region", region_options, index=region_options.index(user_profile["region"]))
             bf_duration = st.selectbox("Breastfeeding Duration", bf_duration_options, index=bf_duration_options.index(user_profile["bf_duration"]))
             conditions = st.multiselect("Health Conditions (Optional)", options=condition_options, default=user_profile["conditions"])
 
-            # Add the submit button inside the form
-            submitted = st.form_submit_button("Update Profile")
+            submitted = st.form_submit_button("✅ Update Profile")
 
             if submitted:
-                # Map breastfeeding duration to breastfeeding stage
                 bf_stage_mapping = {
                     "0-6 Months": "Lactation",
                     "6-12 Months": "Weaning",
@@ -70,18 +107,10 @@ if edit_profile:
                 }
                 bf_stage = bf_stage_mapping.get(bf_duration, "Lactation")
 
-                # Health Condition Mapping - Map invalid conditions to "None"
-                valid_condition_mapping = {
-                    "PCOS": "None",
-                    "Hypertension": "Hypertension",
-                    "Diabetes": "Diabetes",
-                    "Thyroid Issues": "Thyroid",
-                }
+                # No remapping necessary, pass directly
+                mapped_conditions = conditions
 
-                # Map user's selected conditions to the valid conditions
-                mapped_conditions = [valid_condition_mapping.get(cond, "None") for cond in conditions]
-
-                # Update the user profile in session state
+                # Update session state
                 st.session_state.user_profile = {
                     "name": user_profile["name"],
                     "age": age,
@@ -94,35 +123,36 @@ if edit_profile:
                 st.success("✅ Profile updated successfully!")
 
 # =============================================
-# GET MEAL PLAN FROM API
+# GET MEAL PLAN
 # =============================================
-if st.button("Get Meal Plan"):
+st.markdown("---")
+if st.button("📥 Get Meal Plan"):
     profile = st.session_state.user_profile
     with st.spinner("Fetching your personalized meal plan..."):
         try:
             client = Client("ayeshaqamar/nutrition-api")
 
-            # Join the mapped health conditions into a string
-            model_conditions_str = ", ".join(profile["conditions"])
+            health_input = ", ".join(profile["conditions"])
 
-            # Get the model prediction using the user profile data
             result = client.predict(
                 age=profile["age"],
                 region=profile["region"],
-                stage=profile["bf_stage"],  # Use mapped bf_stage
-                health_condition=model_conditions_str,  # Send the mapped health conditions
+                stage=profile["bf_stage"],
+                health_condition=health_input,
                 api_name="/predict"
             )
 
-            st.success(f"Recommended Plan: **{result['plan']}**")
+            st.success(f"🎯 Recommended Plan: **{result['plan']}**")
 
-            st.subheader("🍽️ Meal Ideas")
-            for meal in result.get("meal_ideas", []):
-                st.markdown(f"- {meal}")
+            if result.get("meal_ideas"):
+                st.subheader("🍽️ Meal Ideas")
+                for meal in result["meal_ideas"]:
+                    st.markdown(f"- {meal}")
 
-            st.subheader("🧠 Tips")
-            for tip in result.get("tips", []):
-                st.markdown(f"- {tip}")
+            if result.get("tips"):
+                st.subheader("🧠 Tips")
+                for tip in result["tips"]:
+                    st.markdown(f"- {tip}")
 
         except Exception as e:
-            st.error(f"⚠️ Error fetching meal plan: {str(e)}")
+            st.error(f"⚠️ Error fetching meal plan: {e}")
