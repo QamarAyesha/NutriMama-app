@@ -58,6 +58,7 @@ if edit_profile:
             bf_duration = st.selectbox("Breastfeeding Duration", bf_duration_options, index=bf_duration_options.index(user_profile["bf_duration"]))
             conditions = st.multiselect("Health Conditions (Optional)", options=condition_options, default=user_profile["conditions"])
 
+            # Add the submit button inside the form
             submitted = st.form_submit_button("Update Profile")
 
             if submitted:
