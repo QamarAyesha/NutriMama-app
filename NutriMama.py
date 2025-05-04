@@ -12,7 +12,7 @@ if 'trigger_redirect' not in st.session_state:
     st.session_state.trigger_redirect = False
 
 # ==============================================
-# STYLE CONFIGURATION (IMPROVED UI)
+# STYLE CONFIGURATION
 # ==============================================
 def set_ui_theme():
     st.set_page_config(
@@ -85,74 +85,59 @@ def show_onboarding():
         col1, col2 = st.columns(2)
 
         with col1:
-            age = st.selectbox(
-                "Your Age Group*",
-                options=["18-25", "26-35", "36-45", "45+"],
-                index=1
-            )
-
-            region = st.selectbox(
-                "Region*",
-                options=["North America", "South Asia", "Africa", "Europe", "Other"],
-                index=0
-            )
+            age = st.selectbox("Your Age Group*", ["18-25", "26-35", "36-45", "45+"], index=1)
+            region = st.selectbox("Region*", ["North America", "South Asia", "Africa", "Europe", "Other"], index=0)
 
         with col2:
             bf_stage = st.radio(
-                "Breastfeeding Stage*",
-                options=["0-6 Months", "6-12 Months", "12+ Months"],
-                index=0
+                "Breastfeeding Stage*", ["0-6 Months", "6-12 Months", "12+ Months"], index=0
             )
-
             conditions = st.multiselect(
                 "Health Considerations (Optional)",
-                options=["Diabetes", "Hypertension", "PCOS", "Thyroid Issues"],
+                ["Diabetes", "Hypertension", "PCOS", "Thyroid Issues"],
                 default=[]
             )
 
         submitted = st.form_submit_button("Begin Your Journey →")
 
-    if submitted:
-        if not all([name, age, region, bf_stage]):
-            st.error("Please fill all required fields (*)")
-        else:
-            # Map to model-friendly stage labels
-            stage_map = {
-                "0-6 Months": "Lactation",
-                "6-12 Months": "Weaning",
-                "12+ Months": "Extended"
-            }
+        if submitted:
+            if not all([name, age, region, bf_stage]):
+                st.error("Please fill all required fields (*)")
+            else:
+                stage_map = {
+                    "0-6 Months": "Lactation",
+                    "6-12 Months": "Weaning",
+                    "12+ Months": "Extended"
+                }
 
-            st.session_state.user_profile = {
-                "name": name,
-                "age": age,
-                "region": region,
-                "bf_stage": stage_map.get(bf_stage, "Lactation"),
-                "conditions": conditions,
-                "onboarded_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            }
+                st.session_state.user_profile = {
+                    "name": name,
+                    "age": age,
+                    "region": region,
+                    "bf_stage": stage_map.get(bf_stage, "Lactation"),
+                    "conditions": conditions,
+                    "onboarded_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                }
 
-            st.session_state.trigger_redirect = True
-            st.experimental_rerun()
+                st.session_state.trigger_redirect = True
+                st.rerun()
 
 # ==============================================
 # MAIN APP FLOW
 # ==============================================
 set_ui_theme()
 
-# Redirect after successful onboarding
 if st.session_state.trigger_redirect:
     st.session_state.trigger_redirect = False
-    st.success("✅ Profile saved successfully!")
-    if st.button("OK → Go to Home"):
-        st.session_state.show_onboarding = False
-        st.switch_page("pages/1_Home.py")
+    st.session_state.show_onboarding = False
+    st.success("✅ Profile saved successfully! Redirecting to home...")
+    st.switch_page("pages/1_Home.py")
 
-# Show onboarding or main screen
 elif st.session_state.show_onboarding:
     show_onboarding()
+
 else:
     st.write(f"Welcome back, {st.session_state.user_profile['name']}!")
     st.write("You're ready to get your personalized meal plan!")
     if st.button("Go to Meal Plan Page"):
-        st.switch_page("pages/2_Plan.py")  # Assuming this is the meal plan page
+        st.switch_page("pages/2_Plan.py")
