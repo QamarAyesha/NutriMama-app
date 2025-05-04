@@ -81,7 +81,6 @@ st.write(f"**Health Conditions:** {', '.join(user_profile['conditions']) if user
 # =============================================
 # EDIT PROFILE OPTION
 # =============================================
-# Edit Profile Option
 edit_profile = st.button("✏️ Edit Profile")
 
 if edit_profile:
@@ -89,26 +88,34 @@ if edit_profile:
         with st.form("update_profile_form"):
             st.subheader("🔄 Update Profile")
 
-            # Define options and get selected values
+            # Define options
             age_options = ["18-25", "26-35", "36-45", "45+"]
             region_options = ["North America", "South Asia", "Africa", "Europe", "Middle East", "Other"]
             bf_duration_options = ["0-6 Months", "6-12 Months", "12+ Months"]
             condition_options = ["Anemia", "Diabetes", "Thyroid", "PCOS", "Hypertension", "Obesity", "Cholesterol", "None"]
 
+            # Safe index helper
+            def safe_index(options, value, default=0):
+                try:
+                    return options.index(value)
+                except ValueError:
+                    return default
+
             # Profile Form Inputs (excluding name)
-            age = st.selectbox("Age Group", age_options, index=age_options.index(user_profile["age"]))
-            region = st.selectbox("Region", region_options, index=region_options.index(user_profile["region"]))
-            bf_duration = st.selectbox("Breastfeeding Duration", bf_duration_options, index=bf_duration_options.index(user_profile["bf_duration"]))
+            age = st.selectbox("Age Group", age_options, index=safe_index(age_options, user_profile["age"]))
+            region = st.selectbox("Region", region_options, index=safe_index(region_options, user_profile["region"]))
+            bf_duration = st.selectbox("Breastfeeding Duration", bf_duration_options, index=safe_index(bf_duration_options, user_profile["bf_duration"]))
             conditions = st.multiselect("Health Conditions (Optional)", options=condition_options, default=user_profile["conditions"])
 
             # Form submit button
             submitted = st.form_submit_button("✅ Update Profile")
 
             if submitted:
+                st.write("DEBUG: Form submitted")
                 if not all([age, region, bf_duration]):
                     st.error("⚠️ Please fill all required fields.")
                 else:
-                    # Map breastfeeding duration to stage for internal use
+                    # Map breastfeeding duration to stage
                     bf_stage_mapping = {
                         "0-6 Months": "Lactation",
                         "6-12 Months": "Weaning",
@@ -116,9 +123,12 @@ if edit_profile:
                     }
                     bf_stage = bf_stage_mapping.get(bf_duration, "Lactation")
 
-                    # Update session state with new profile data, keeping the name unchanged
+                    # Debug before update
+                    st.write("DEBUG: Before update", st.session_state.user_profile)
+
+                    # Update session state
                     st.session_state.user_profile = {
-                        "name": user_profile["name"],  # Keep the original name unchanged
+                        "name": user_profile["name"],
                         "age": age,
                         "region": region,
                         "bf_duration": bf_duration,
@@ -127,8 +137,10 @@ if edit_profile:
                         "onboarded_at": user_profile.get("onboarded_at", "")
                     }
 
+                    # Debug after update
+                    st.write("DEBUG: After update", st.session_state.user_profile)
                     st.success("✅ Profile updated successfully!")
-                    st.rerun()  # 🚀 Trigger UI refresh
+                    # st.rerun()  # Comment out for testing
 
 # =============================================
 # GET MEAL PLAN
