@@ -1,11 +1,11 @@
 import streamlit as st
 import pandas as pd
 from datetime import datetime
+from PIL import Image
 import os
-from PIL import Image  # For more robust image loading
 
 # =============================================
-# SET PAGE CONFIG (IMPORTANT! Call immediately)
+# PAGE CONFIGURATION
 # =============================================
 st.set_page_config(
     page_title="NutriMama - Home",
@@ -13,6 +13,13 @@ st.set_page_config(
     initial_sidebar_state="expanded",
     page_icon="🍎"
 )
+
+# =============================================
+# SESSION CHECK: Redirect if no profile
+# =============================================
+if 'user_profile' not in st.session_state or not st.session_state.user_profile:
+    st.warning("🚨 Please complete onboarding first.")
+    st.switch_page("Nutrimama.py")  # Assumes Nutrimama.py is the main onboarding page
 
 # =============================================
 # STYLE CONFIGURATION
@@ -27,6 +34,9 @@ def set_ui_theme():
         .logo {{
             margin-bottom: 1.5rem;
         }}
+        h2 {{
+            color: #333;
+        }}
     </style>
     """, unsafe_allow_html=True)
 
@@ -35,20 +45,17 @@ def set_ui_theme():
 # =============================================
 def load_image(image_path, width=120):
     try:
-        st.image(image_path, width=width, output_format="PNG")
-    except:
-        try:
-            img = Image.open(image_path)
-            st.image(img, width=width)
-        except Exception as e:
-            st.error(f"Image loading failed: {str(e)}")
-            st.markdown(f"<div style='width:{width}px; height:{width}px; background:#f0f2f6;'></div>", unsafe_allow_html=True)
+        st.image(image_path, width=width)
+    except Exception as e:
+        st.error("❌ Failed to load image.")
+        st.markdown(f"<div style='width:{width}px; height:{width}px; background:#f0f2f6;'></div>", unsafe_allow_html=True)
 
 # =============================================
 # PAGE COMPONENTS
 # =============================================
 def greeting_header():
-    username = st.session_state.get("user_profile", {}).get("name", "User")
+    profile = st.session_state.user_profile
+    username = profile.get("name", "User")
     current_hour = datetime.now().hour
     greeting = (
         "Good morning" if 5 <= current_hour < 12 else
@@ -73,10 +80,7 @@ def daily_tip():
     tip = "Did you know? Adding spinach to smoothies boosts iron intake without changing the flavor!"
     st.info(f"💡 Today's Tip: {tip}")
 
-
-
 def medication_safety_section():
-    st.markdown('<div class="section">', unsafe_allow_html=True)
     st.subheader("💊 Medication Safety Checker for Breastfeeding")
     
     med_input = st.radio("Input Method:", ["Search Manually", "Scan Barcode"], horizontal=True)
@@ -88,22 +92,14 @@ def medication_safety_section():
         medication = st.text_input("Enter medication name", placeholder="e.g., Ibuprofen")
     
     with st.expander("Infant Details (Optional)"):
-        infant_age = st.selectbox(
-            "Infant Age", 
-            ["Newborn (0-1 month)", "1-6 months", "6+ months"]
-        )
+        infant_age = st.selectbox("Infant Age", ["Newborn (0-1 month)", "1-6 months", "6+ months"])
     
     if st.button("Check Safety"):
         if med_input == "Search Manually" and not medication:
             st.warning("Please enter a medication name")
         else:
-            safety_data = check_lactation_safety(
-                medication,
-                infant_age if infant_age else "1-6 months"
-            )
+            safety_data = check_lactation_safety(medication, infant_age or "1-6 months")
             display_safety_results(safety_data)
-    
-    st.markdown('</div>', unsafe_allow_html=True)
 
 def check_lactation_safety(drug_name, infant_age="1-6 months"):
     lactation_db = {
@@ -152,7 +148,7 @@ def display_safety_results(data):
 # =============================================
 def main():
     set_ui_theme()
-    load_image("assets/logo.png", width=140)  # Ensure this path is correct
+    load_image("assets/logo.png", width=140)  # Update this path if needed
     greeting_header()
     nutrition_stats()
     daily_tip()
