@@ -18,16 +18,16 @@ def community_page():
             font-family: 'Arial', sans-serif;
         }
         .stButton button {
-            background-color: #f9c8a7;
-            color: #333333;
-            border-radius: 12px;
-            padding: 0.5rem 1rem;
-            border: none;
-            font-weight: 600;
-            margin-top: 10px;
+            background-color: #f9c8a7 !important;
+            color: #333333 !important;
+            border-radius: 12px !important;
+            padding: 0.5rem 1rem !important;
+            border: none !important;
+            font-weight: 600 !important;
+            margin-top: 10px !important;
         }
         .stButton button:hover {
-            background-color: #e8b49d;
+            background-color: #e8b49d !important;
         }
 
         .stTextInput, .stTextArea {
