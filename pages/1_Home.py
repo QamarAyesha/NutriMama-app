@@ -19,7 +19,7 @@ st.set_page_config(
 # =============================================
 if 'user_profile' not in st.session_state or not st.session_state.user_profile:
     st.warning("🚨 Please complete onboarding first.")
-    st.markdown("👉 Click **'NutriMama'** in the left menu to begin onboarding.")
+    st.markdown("Click **'NutriMama'** in the left menu to begin onboarding.")
     st.stop()
 
 # =============================================
@@ -145,7 +145,7 @@ def display_safety_results(data):
             st.markdown(f"- {alt}")
 
 def meal_plan_redirect():
-    st.subheader("🥗 Personalized Meal Plan")
+    st.subheader("Personalized Meal Plan")
     st.write("Based on your onboarding info, view your tailored daily plan.")
     if st.button("View My Personalized Meal Plan"):
         st.switch_page("pages/2_Plan.py")
