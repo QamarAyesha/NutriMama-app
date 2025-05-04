@@ -16,19 +16,20 @@ health_condition = st.selectbox("Health condition", ["None", "Anemia", "Diabetes
 if st.button("Get Meal Plan"):
     with st.spinner("Fetching your personalized meal plan..."):
         try:
-            # Prepare input for Gradio API
+            # Payload for Gradio API
             payload = {
                 "data": [age, region, stage, health_condition]
             }
 
+            # Send POST request to Hugging Face Gradio Space
             response = requests.post(
-                "https://ayeshaqamar-nutrition-api.hf.space/run/predict",
+                "https://ayeshaqamar-nutrition-api.hf.space/api/predict/",
                 json=payload
             )
 
             if response.status_code == 200:
                 result = response.json()
-                output = result["data"][0]  # Adjust this based on your return format
+                output = result["data"][0]  # Gradio wraps output inside 'data' list
 
                 st.success(f"Recommended Plan: **{output['plan']}**")
 
