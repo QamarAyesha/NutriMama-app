@@ -10,7 +10,9 @@ from pathlib import Path
 if 'user_profile' not in st.session_state:
     st.session_state.user_profile = None
 if 'show_onboarding' not in st.session_state:
-    st.session_state.show_onboarding = True  # Set this to True initially to show onboarding
+    st.session_state.show_onboarding = True
+if 'profile_saved' not in st.session_state:
+    st.session_state.profile_saved = False
 
 # ==============================================
 # STYLE CONFIGURATION (IMPROVED UI)
@@ -25,12 +27,9 @@ def set_ui_theme():
 
     st.markdown(f"""
     <style>
-        /* Background gradient */
         .stApp {{
             background: linear-gradient(135deg, #F8FBFF, #E4F0F6);
         }}
-
-        /* Card-style sections */
         .stContainer, .stExpander {{
             background-color: #FFFFFF;
             border-radius: 12px;
@@ -39,8 +38,6 @@ def set_ui_theme():
             margin-bottom: 20px;
             border: 1px solid #E6F1F7;
         }}
-
-        /* Buttons */
         .stButton>button {{
             background-color: #FFB996;
             color: #333333;
@@ -55,8 +52,6 @@ def set_ui_theme():
             background-color: #FF9C85;
             transform: scale(1.05);
         }}
-
-        /* Typography */
         h1, h2, h3 {{
             color: #333333;
             font-family: 'Arial', sans-serif;
@@ -65,8 +60,6 @@ def set_ui_theme():
             color: #666666;
             font-size: 16px;
         }}
-
-        /* Logo container - UPDATED FOR PERFECT CENTERING */
         .logo-container {{
             display: flex;
             justify-content: center;
@@ -126,43 +119,43 @@ def show_onboarding():
         if not all([name, age, region, bf_stage]):
             st.error("Please fill all required fields (*)")
         else:
-            # Map the age group to a more suitable model stage if needed
-            if bf_stage == "0-6 Months":
-                bf_stage = "Lactation"
-            elif bf_stage == "6-12 Months":
-                bf_stage = "Weaning"
-            elif bf_stage == "12+ Months":
-                bf_stage = "Extended"
+            stage_map = {
+                "0-6 Months": "Lactation",
+                "6-12 Months": "Weaning",
+                "12+ Months": "Extended"
+            }
 
-            # Save profile in session state
             st.session_state.user_profile = {
                 "name": name,
                 "age": age,
                 "region": region,
-                "bf_stage": bf_stage,
+                "bf_stage": stage_map.get(bf_stage, "Lactation"),
                 "conditions": conditions,
                 "onboarded_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             }
-            st.success("Profile saved successfully!")
-            
-            # Update session state flag to indicate that onboarding is complete
-            st.session_state.show_onboarding = False
+            st.session_state.profile_saved = True
+
 
 # ==============================================
 # MAIN APP FLOW
 # ==============================================
 set_ui_theme()
 
-# Show onboarding or skip to the main app depending on whether the user has completed onboarding
-if st.session_state.show_onboarding:
+# Step 1: Show onboarding form
+if st.session_state.show_onboarding and not st.session_state.profile_saved:
     show_onboarding()
+
+# Step 2: Show success + OK button
+elif st.session_state.profile_saved:
+    st.success("✅ Profile saved successfully!")
+    if st.button("OK → Go to Home"):
+        st.session_state.show_onboarding = False
+        st.session_state.profile_saved = False
+        st.switch_page("pages/1_Home.py")  # Adjust this path if needed
+
+# Step 3: Already onboarded user
 else:
-    # Show the home page or the main content after onboarding is complete
     st.write(f"Welcome back, {st.session_state.user_profile['name']}!")
     st.write("You're ready to get your personalized meal plan!")
-    
-    # Button to navigate to the meal plan page (or another page)
     if st.button("Go to Meal Plan Page"):
-        # You can replace this with a page switch or redirection logic (like `st.experimental_rerun()` or `st.switch_page('plan')`)
-        st.session_state.show_onboarding = False  # Hide onboarding page if present
-        st.experimental_rerun()  # This will rerun and can be used for page switching or redirection
+        st.switch_page("pages/2_Plan.py")
