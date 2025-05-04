@@ -19,8 +19,8 @@ if st.button("Get Meal Plan"):
             # Initialize the Gradio client
             client = Client("ayeshaqamar/nutrition-api")
             
-            # Pass the inputs as a list, in the correct order
-            result = client.predict([age, region, stage, health_condition], api_name="/predict")
+            # Pass the inputs separately as arguments, not as a list
+            result = client.predict(age, region, stage, health_condition, api_name="/predict")
             
             # Display the result
             st.success(f"Recommended Plan: **{result['plan']}**")
