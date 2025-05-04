@@ -37,54 +37,60 @@ st.write(f"Breastfeeding Duration: {user_profile['bf_duration']} (Internal Stage
 st.write(f"Health Conditions: {', '.join(user_profile['conditions']) if user_profile['conditions'] else 'None'}")
 
 # =============================================
-# EDIT PROFILE FORM
+# EDIT PROFILE BUTTON & FORM (Hidden by Default)
 # =============================================
-with st.form("update_profile_form"):
-    st.subheader("Update Your Profile Information")
+# Button to toggle editing profile
+edit_profile = st.button("Edit Profile")
 
-    age_options = ["18-25", "26-35", "36-45", "45+"]
-    region_options = ["North America", "South Asia", "Africa", "Europe", "Other"]
-    bf_duration_options = ["0-6 Months", "6-12 Months", "12+ Months"]
-    condition_options = ["Diabetes", "Hypertension", "PCOS", "Thyroid Issues"]
+if edit_profile:
+    with st.expander("Update Your Profile Information", expanded=True):  # Expand form only when clicked
+        # Form to update profile
+        with st.form("update_profile_form"):
+            st.subheader("Update Profile")
 
-    age = st.selectbox("Age Group", age_options, index=age_options.index(user_profile["age"]))
-    region = st.selectbox("Region", region_options, index=region_options.index(user_profile["region"]))
-    bf_duration = st.selectbox("Breastfeeding Duration", bf_duration_options, index=bf_duration_options.index(user_profile["bf_duration"]))
-    conditions = st.multiselect("Health Conditions (Optional)", options=condition_options, default=user_profile["conditions"])
+            age_options = ["18-25", "26-35", "36-45", "45+"]
+            region_options = ["North America", "South Asia", "Africa", "Europe", "Other"]
+            bf_duration_options = ["0-6 Months", "6-12 Months", "12+ Months"]
+            condition_options = ["Diabetes", "Hypertension", "PCOS", "Thyroid Issues"]
 
-    submitted = st.form_submit_button("Update Profile")
+            age = st.selectbox("Age Group", age_options, index=age_options.index(user_profile["age"]))
+            region = st.selectbox("Region", region_options, index=region_options.index(user_profile["region"]))
+            bf_duration = st.selectbox("Breastfeeding Duration", bf_duration_options, index=bf_duration_options.index(user_profile["bf_duration"]))
+            conditions = st.multiselect("Health Conditions (Optional)", options=condition_options, default=user_profile["conditions"])
 
-    if submitted:
-        # Map breastfeeding duration to breastfeeding stage
-        bf_stage_mapping = {
-            "0-6 Months": "Lactation",
-            "6-12 Months": "Weaning",
-            "12+ Months": "Extended"
-        }
-        bf_stage = bf_stage_mapping.get(bf_duration, "Lactation")
+            submitted = st.form_submit_button("Update Profile")
 
-        # Health Condition Mapping - Map invalid conditions to "None"
-        valid_condition_mapping = {
-            "PCOS": "None",
-            "Hypertension": "Hypertension",
-            "Diabetes": "Diabetes",
-            "Thyroid Issues": "Thyroid",
-        }
+            if submitted:
+                # Map breastfeeding duration to breastfeeding stage
+                bf_stage_mapping = {
+                    "0-6 Months": "Lactation",
+                    "6-12 Months": "Weaning",
+                    "12+ Months": "Extended"
+                }
+                bf_stage = bf_stage_mapping.get(bf_duration, "Lactation")
 
-        # Map user's selected conditions to the valid conditions
-        mapped_conditions = [valid_condition_mapping.get(cond, "None") for cond in conditions]
+                # Health Condition Mapping - Map invalid conditions to "None"
+                valid_condition_mapping = {
+                    "PCOS": "None",
+                    "Hypertension": "Hypertension",
+                    "Diabetes": "Diabetes",
+                    "Thyroid Issues": "Thyroid",
+                }
 
-        # Update the user profile in session state
-        st.session_state.user_profile = {
-            "name": user_profile["name"],
-            "age": age,
-            "region": region,
-            "bf_duration": bf_duration,
-            "bf_stage": bf_stage,
-            "conditions": mapped_conditions,
-            "onboarded_at": user_profile.get("onboarded_at", "")
-        }
-        st.success("✅ Profile updated successfully!")
+                # Map user's selected conditions to the valid conditions
+                mapped_conditions = [valid_condition_mapping.get(cond, "None") for cond in conditions]
+
+                # Update the user profile in session state
+                st.session_state.user_profile = {
+                    "name": user_profile["name"],
+                    "age": age,
+                    "region": region,
+                    "bf_duration": bf_duration,
+                    "bf_stage": bf_stage,
+                    "conditions": mapped_conditions,
+                    "onboarded_at": user_profile.get("onboarded_at", "")
+                }
+                st.success("✅ Profile updated successfully!")
 
 # =============================================
 # GET MEAL PLAN FROM API
