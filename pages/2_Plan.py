@@ -120,6 +120,8 @@ if edit_profile:
                     "conditions": mapped_conditions,
                     "onboarded_at": user_profile.get("onboarded_at", "")
                 }
+                 # Debugging: Confirm profile update
+                st.write(f"Updated Profile: {st.session_state.user_profile}")  # Debugging step
                 st.success("✅ Profile updated successfully!")
                 st.rerun()  # 🚀 Trigger UI refresh
 
