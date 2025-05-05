@@ -4,7 +4,7 @@
 
 ---
 
-## 🌟 Features
+## Features
 
 - **Onboarding Form**: Collects age, region, breastfeeding stage, and health conditions.
 - **ML-Powered Recommendations**: Suggests nutrition plans based on user input using a trained RandomForestClassifier.
@@ -28,7 +28,7 @@
 
 ---
 
-## 📊 How it Works
+## How it Works
 
 1. **User Onboards**: Fills out a simple form.
 2. **Data Encoded**: Inputs are transformed using label encoders & binarizers.
@@ -37,7 +37,7 @@
 
 ---
 
-## 🧠 Machine Learning
+## Machine Learning
 
 - **Model**: RandomForestClassifier (100 trees)
 - **Data**: 100 samples of simulated user profiles
@@ -51,7 +51,7 @@ Model training script is located in `train_model.py`. Artifacts saved in `/model
 
 ---
 
-## 🔮 Future Plans
+## Future Plans
 
 - [ ] Save user profiles to Airtable or Firebase
 - [ ] Barcode scanning for food logging (Pillow)
@@ -60,5 +60,17 @@ Model training script is located in `train_model.py`. Artifacts saved in `/model
 
 ---
 
+## Development Guide
+### Setup
 
+git clone https://github.com/yourusername/NutriMama.git
+cd NutriMama
+pip install -r requirements.txt
+
+###  Run Locally
+
+streamlit run NutriMama.py 
+
+## Demo link to run this application
+https://nutrimama-gjyfqwzn6re4kug3z7tgztutr.streamlit.app/
 
